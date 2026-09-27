@@ -7,6 +7,7 @@ resources:
   - statefulset.yaml
   - secrets.yaml
   - ingress.yaml
+  - deployment.yaml
 
 configMapGenerator:
   - name: config

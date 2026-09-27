@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: egress-proxy
+  namespace: runescape
+data:
+  tinyproxy.conf: |
+    User nobody
+    Group nobody
+    Port 3128
+    Listen 0.0.0.0
+    Timeout 600
+    MaxClients 50
+    Allow 10.42.0.0/16
+    ConnectPort 443
+    DisableViaHeader Yes
+    LogLevel Connect
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egress-proxy
+  namespace: runescape
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: egress-proxy
+  template:
+    metadata:
+      labels:
+        app: egress-proxy
+    spec:
+      # Must egress from the Traefik gateway's public IP, since EOS advertises
+      # the source IP of the server's HTTPS calls as the session host address.
+      nodeSelector:
+        node-role.kubernetes.io/gateway: "true"
+      tolerations:
+        - key: node-role.kubernetes.io/gateway
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+      containers:
+        - name: proxy
+          image: vimagick/tinyproxy@sha256:72b441b95ee1e641af948f68f09492f9f795ead72b73954414e339168c98ad8c
+          ports:
+            - containerPort: 3128
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/tinyproxy/tinyproxy.conf
+              subPath: tinyproxy.conf
+      volumes:
+        - name: config
+          configMap:
+            name: egress-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: egress-proxy
+  namespace: runescape
+spec:
+  selector:
+    app: egress-proxy
+  ports:
+    - port: 3128
