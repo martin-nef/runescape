@@ -27,7 +27,7 @@ spec:
       # TODO: pre-termination 
       containers:
         - name: runescape
-          image: runescape/rsdw-dedicated
+          image: ghcr.io/runescape/rsdw-dedicated
           imagePullPolicy: Always
           resources:
             requests:
