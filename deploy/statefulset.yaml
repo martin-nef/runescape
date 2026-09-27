@@ -1,0 +1,85 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: runescape
+  namespace: runescape
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: runescape
+  template:
+    metadata:
+      labels:
+        app: runescape
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - shitbox
+      terminationGracePeriodSeconds: 35
+      # TODO: pre-termination 
+      containers:
+        - name: runescape
+          image: runescape/rsdw-dedicated
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "4Gi"
+            limits:
+              memory: "16Gi"
+          envFrom:
+            - configMapRef:
+                name: config
+            - secretRef:
+                name: secret
+          volumeMounts:
+            - name: server-files
+              mountPath: /home/steam/rsdw-dedicated
+  volumeClaimTemplates:
+    - metadata:
+        name: server-files
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "local-path"
+        resources:
+          requests:
+            storage: 19Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-1
+  namespace: runescape
+  labels:
+    app: runescape
+spec:
+  ports:
+    - port: 7777
+      name: udp-1
+      protocol: UDP
+  clusterIP: None
+  selector:
+    app: runescape
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-2
+  namespace: runescape
+  labels:
+    app: runescape
+spec:
+  ports:
+    - port: 8888
+      name: udp-2
+      protocol: UDP
+  clusterIP: None
+  selector:
+    app: runescape

@@ -1,0 +1,10 @@
+creation_rules:
+  - path_regex: .*secrets?.*\.ya?ml$
+    encrypted_regex: ^(data|stringData)$
+    age: age16cn7ty3r06x5re6mpk56a05qsc5cjnxyp7a7mx6y6gwcpc7s4g7s5630vu
+  - path_regex: .*\.toml$
+    age: age16cn7ty3r06x5re6mpk56a05qsc5cjnxyp7a7mx6y6gwcpc7s4g7s5630vu
+    input_type: binary
+  - path_regex: secret-key$
+    age: age16cn7ty3r06x5re6mpk56a05qsc5cjnxyp7a7mx6y6gwcpc7s4g7s5630vu
+    input_type: binary

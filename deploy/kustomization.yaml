@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: runescape
+
+resources:
+  - namespace.yaml
+  - statefulset.yaml
+  - secrets.yaml
+  - ingress.yaml
+
+configMapGenerator:
+  - name: config
+    envs:
+      - config.env
+    files:
+      - MODS=mods.txt

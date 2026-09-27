@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: ingress-1
+  namespace: runescape
+spec:
+  entryPoints:
+    - runescape-1
+  routes:
+    - services:
+        - name: service-1
+          port: 7777
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: ingress-2
+  namespace: runescape
+spec:
+  entryPoints:
+    - runescape-2
+  routes:
+    - services:
+        - name: service-2
+          port: 8888
