@@ -24,7 +24,8 @@ spec:
                     values:
                       - shitbox
       terminationGracePeriodSeconds: 35
-      # TODO: pre-termination 
+      # TODO: pre-termination with systemctl stop dragonwilds
+      # TODO: health check using systemctl status dragonwilds (is that a good idea?)
       containers:
         - name: runescape
           image: ghcr.io/runescape/rsdw-dedicated
