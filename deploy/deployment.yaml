@@ -6,8 +6,6 @@ metadata:
   namespace: runescape
 data:
   tinyproxy.conf: |
-    User nobody
-    Group nobody
     Port 3128
     Listen 0.0.0.0
     Timeout 600
@@ -43,7 +41,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: proxy
-          image: vimagick/tinyproxy@sha256:72b441b95ee1e641af948f68f09492f9f795ead72b73954414e339168c98ad8c
+          image: kalaksi/tinyproxy@sha256:fafafc7079ca29c6704564de1353f61d038f2166f09b01d4e460e8e499bf6b57
           ports:
             - containerPort: 3128
           resources:
