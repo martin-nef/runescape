@@ -25,7 +25,6 @@ spec:
                       - shitbox
       terminationGracePeriodSeconds: 35
       # TODO: pre-termination with systemctl stop dragonwilds
-      # TODO: health check using systemctl status dragonwilds (is that a good idea?)
       containers:
         - name: runescape
           image: ghcr.io/runescape/rsdw-dedicated
@@ -34,7 +33,35 @@ spec:
             requests:
               memory: "4Gi"
             limits:
-              memory: "16Gi"
+              memory: "18Gi"
+          # Restart the server when its log goes quiet. A healthy server logs at
+          # least every ~30s (EOS heartbeat), even when empty. On 2026-10-02 it
+          # stopped logging at the memory limit and hung for an hour before the
+          # OOM kill. The game's process name is truncated to RSDragonwildsSe.
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - >-
+                  pgrep -x RSDragonwildsSe >/dev/null
+                  && [ $(( $(date +%s) - $(stat -c %Y /home/steam/rsdw-dedicated/RSDragonwilds/Saved/Logs/RSDragonwilds.log) )) -lt 300 ]
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
+          # steamcmd runs before the server starts, and a full verify or download
+          # can take a while, so give it up to an hour to start logging.
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - >-
+                  pgrep -x RSDragonwildsSe >/dev/null
+                  && [ $(( $(date +%s) - $(stat -c %Y /home/steam/rsdw-dedicated/RSDragonwilds/Saved/Logs/RSDragonwilds.log) )) -lt 300 ]
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 120
           envFrom:
             - configMapRef:
                 name: config
