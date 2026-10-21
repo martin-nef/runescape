@@ -70,6 +70,15 @@ spec:
           volumeMounts:
             - name: server-files
               mountPath: /home/steam/rsdw-dedicated
+            # Keep SteamCMD's depot manifest cache across restarts. To apply an
+            # update as a delta, steamcmd needs the installed build's manifest,
+            # and Steam refuses to re-send a superseded one to anonymous logins
+            # ('Access Denied'). Without it, every update fails once and then
+            # redownloads the full 5.5 GB. A subPath of the existing claim,
+            # because volumeClaimTemplates can't change on a live StatefulSet.
+            - name: server-files
+              mountPath: /home/steam/Steam
+              subPath: steam-home
   volumeClaimTemplates:
     - metadata:
         name: server-files
