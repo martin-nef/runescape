@@ -33,7 +33,7 @@ spec:
             requests:
               memory: "4Gi"
             limits:
-              memory: "18Gi"
+              memory: "10Gi"
           # Restart the server when its log goes quiet. A healthy server logs at
           # least every ~30s (EOS heartbeat), even when empty. On 2026-10-02 it
           # stopped logging at the memory limit and hung for an hour before the
