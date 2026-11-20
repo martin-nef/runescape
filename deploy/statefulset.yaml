@@ -24,11 +24,23 @@ spec:
                     values:
                       - shitbox
       terminationGracePeriodSeconds: 35
+      # The image's steam user, with no way to gain privileges back. No
+      # fsGroup: local-path volumes ignore it, and the files are already 1000's.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       # TODO: pre-termination with systemctl stop dragonwilds
       containers:
         - name: runescape
           image: ghcr.io/runescape/rsdw-dedicated
           imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           resources:
             requests:
               memory: "4Gi"

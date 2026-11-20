@@ -39,11 +39,22 @@ spec:
           operator: Equal
           value: "true"
           effect: NoSchedule
+      # The image's own tinyproxy user, with no way to gain privileges back.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 57981
+        runAsGroup: 57981
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: proxy
           image: kalaksi/tinyproxy@sha256:fafafc7079ca29c6704564de1353f61d038f2166f09b01d4e460e8e499bf6b57
           ports:
             - containerPort: 3128
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           resources:
             requests:
               cpu: 10m
